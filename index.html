@@ -508,7 +508,7 @@
             cursorY += distY * speed;
 
             const velocity = Math.sqrt(distX * distX + distY * distY);
-            const scale = Math.min(dist / 15, 0.5);
+            const scale = Math.min(velocity / 15, 0.5);
             const angle = Math.atan2(distY, distX) * 180 / Math.PI;
 
             cursor.style.transform = `
