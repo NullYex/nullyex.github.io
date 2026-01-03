@@ -61,7 +61,7 @@
             border: 2.39px solid var(--cursor-ball-color); 
             box-shadow: 0 0 3px var(--cursor-ball-color);
             background-color: rgba(0, 0, 0, 0); 
-            backdrop-filter: blur(1px);
+            /* backdrop-filter: blur(1px); */
             border-radius: 50%;
             pointer-events: none;
             z-index: 9999;
@@ -487,7 +487,7 @@
         
         let mouseX = 0, mouseY = 0;
         let cursorX = 0, cursorY = 0;
-        const speed = 0.15;
+        const speed = 0.5;
 
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
@@ -508,7 +508,7 @@
             cursorY += distY * speed;
 
             const velocity = Math.sqrt(distX * distX + distY * distY);
-            const scale = Math.min(velocity / 100, 0.4); 
+            const scale = Math.min(dist / 15, 0.5);
             const angle = Math.atan2(distY, distX) * 180 / Math.PI;
 
             cursor.style.transform = `
