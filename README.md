@@ -1,2 +1,1 @@
-# nullyex.github.io
-Yex... we have a domain now
+# [`Yex... we have a domain now 😁`](http://nullyex.com/)
