@@ -1,604 +1,1039 @@
 <!DOCTYPE html>
 <html lang="en-US">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NullYex | Project Hub</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --bg-color: #050505;
-            --card-bg: #0a0a0a;
-            --text-color: #e0e0e0;
-            --status-bar-bg: #0a0a0a;
-            --accent-green: #2ecc71;
-            --accent-blue: #00e1ff;
-            --border-color: #333333;
-            --font-stack: 'JetBrains Mono', monospace; 
-            --radius: 16px;
-            --system-accent-color: var(--accent-green);
-            --cursor-ball-color: var(--accent-blue);
-            --dim-color: rgba(46, 204, 113, 0.05);
-        }
-
-        [data-theme="light"] {
-            --bg-color: #f4f4f5;
-            --card-bg: #ffffff;
-            --text-color: #18181b;
-            --border-color: #e4e4e7;
-            --status-bar-bg: #ffffff;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: var(--font-stack);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        #custom-cursor {
-            display: none; 
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 21px;
-            height: 21px;
-            border: 2.39px solid var(--cursor-ball-color); 
-            box-shadow: 0 0 3px var(--cursor-ball-color);
-            background-color: rgba(0, 0, 0, 0); 
-            /* backdrop-filter: blur(1px); */
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            transform-origin: center center;
-            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
-            mix-blend-mode: exclusion;
-            will-change: transform; 
-        }
-
-        @media (pointer: fine) {
-            * { cursor: none !important; }
-            #custom-cursor { display: block; }
-            body.hovering #custom-cursor {
-                background-color: rgba(0, 0, 0, 0);
-                box-shadow: 0 0 6px var(--cursor-ball-color);
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>NullYex | Project Hub</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+        <style>
+            :root {
+                --bg-color: #050505;
+                --glass-bg: rgba(20, 20, 20, 0.4);
+                --glass-border: rgba(255, 255, 255, 0.08);
+                --text-color: #f0f0f0;
+                --text-muted: #a0a0a0;
+                --accent-green: #2ecc71;
+                --accent-blue: #00e1ff;
+                --dim-color: rgba(46, 204, 113, 0.05);
+                --font-main: 'JetBrains Mono', monospace;
+                --radius-pebble: 24px;
+                --system-accent-color: var(--accent-green);
+                --cursor-ball-color: var(--accent-blue);
             }
-        }
 
-        .container {
-            width: 100%;
-            max-width: 950px;
-            padding: 20px;
-        }
+            [data-theme="light"] {
+                --bg-color: #f4f4f5;
+                --glass-bg: rgba(255, 255, 255, 0.6);
+                --glass-border: rgba(0, 0, 0, 0.08);
+                --text-color: #18181b;
+                --text-muted: #666666;
+                --accent-blue: #0088cc;
+                --dim-color: rgba(0, 136, 204, 0.05);
+            }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 40px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 20px;
-            transition: border-color 0.3s ease;
-        }
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
 
-        .brand {
-            font-size: 2.5rem;
-            font-weight: bold;
-            letter-spacing: -2px;
-        }
+            body {
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                font-family: var(--font-main);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                padding: 20px;
+                overflow-x: hidden;
+                transition: background-color 0.5s ease, color 0.5s ease;
+                position: relative;
+            }
 
-        .header-right {
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 10px;
-        }
+            body::before, body::after {
+                content: '';
+                position: fixed;
+                width: 40vw;
+                height: 40vw;
+                border-radius: 50%;
+                filter: blur(100px);
+                z-index: -1;
+                opacity: 0.15;
+                pointer-events: none;
+            }
 
-        .meta-info {
-            font-size: 0.8rem;
-            opacity: 0.7;
-            line-height: 1.4;
-        }
+            body::before {
+                background: var(--accent-green);
+                top: -10%;
+                left: -10%;
+            }
 
-        .theme-btn {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            font-family: var(--font-stack);
-            font-size: 0.7rem;
-            padding: 4px 8px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            font-weight: bold;
-        }
-        
-        .theme-btn:hover {
-            border-color: var(--system-accent-color);
-            color: var(--system-accent-color);
-            box-shadow: 0 0 10px var(--dim-color);
-        }
+            body::after {
+                background: var(--accent-blue);
+                bottom: -10%;
+                right: -10%;
+            }
 
-        .system-status {
-            margin-bottom: 30px;
-        }
+            @media (pointer: fine) {
+                * {
+                    cursor: none !important;
+                }
+            }
 
-        .label {
-            font-size: 0.7rem;
-            opacity: 0.6;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: bold;
-        }
+            .target-cursor-wrapper {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 0;
+                height: 0;
+                pointer-events: none;
+                z-index: 9999;
+                mix-blend-mode: difference;
+                transform: translate(-50%, -50%);
+            }
 
-        .status-bar {
-            background-color: var(--status-bar-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 15px 20px;
-            font-size: 0.9rem;
-            opacity: 0.8;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
+            .target-cursor-dot {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                width: 4px;
+                height: 4px;
+                background: #fff;
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                will-change: transform;
+            }
 
-        .blink {
-            animation: blinker 1s step-end infinite;
-            color: var(--system-accent-color); 
-            transition: color 0.5s ease;
-        }
+            .target-cursor-corner {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 12px;
+                height: 12px;
+                border: 3px solid #fff;
+                will-change: transform, width, height;
+            }
 
-        @keyframes blinker { 50% { opacity: 0; } }
+            .corner-tl {
+                border-right: none;
+                border-bottom: none;
+            }
 
-        .menu-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
+            .corner-tr {
+                border-left: none;
+                border-bottom: none;
+            }
 
-        @media (min-width: 768px) {
+            .corner-br {
+                border-left: none;
+                border-top: none;
+            }
+
+            .corner-bl {
+                border-right: none;
+                border-top: none;
+            }
+
+            .container {
+                width: 100%;
+                max-width: 950px;
+                padding: 20px;
+                z-index: 10;
+            }
+
+            header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+                margin-bottom: 40px;
+                padding-bottom: 20px;
+            }
+
+            .brand {
+                font-size: 3rem;
+                font-weight: 700;
+                letter-spacing: -2px;
+                background: linear-gradient(45deg, var(--text-color), var(--text-muted));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .header-right {
+                text-align: right;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 12px;
+            }
+
+            .meta-info {
+                font-size: 0.75rem;
+                color: var(--text-muted);
+                line-height: 1.5;
+            }
+
+            .theme-btn {
+                background: var(--glass-bg);
+                border: 1px solid var(--glass-border);
+                color: var(--text-color);
+                font-family: var(--font-main);
+                font-size: 0.7rem;
+                padding: 6px 12px;
+                cursor: pointer;
+                border-radius: 20px;
+                transition: all 0.3s ease;
+                font-weight: bold;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+
+            .theme-btn:hover {
+                border-color: var(--system-accent-color);
+                color: var(--system-accent-color);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                transform: translateY(-2px);
+            }
+
+            .system-status {
+                margin-bottom: 40px;
+            }
+
+            .label-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+                font-size: 0.75rem;
+                color: var(--text-muted);
+            }
+
+            .status-bar {
+                background: var(--glass-bg);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                border: 1px solid var(--glass-border);
+                border-radius: 50px;
+                padding: 16px 24px;
+                font-size: 0.9rem;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            }
+
+            .blink {
+                animation: blinker 1s step-end infinite;
+                color: var(--system-accent-color);
+            }
+
+            @keyframes blinker {
+                50% {
+                    opacity: 0;
+                }
+            }
+
             .menu-grid {
-                grid-template-columns: 1fr 1fr;
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 24px;
             }
-        }
 
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: all 0.3s ease;
-            position: relative; 
-            min-height: 180px;
-        }
-
-        .card:hover {
-            border-color: var(--system-accent-color); 
-            background-color: var(--dim-color);
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px -10px var(--dim-color); 
-        }
-
-        .card:hover .project-name {
-            opacity: 1;
-        }
-
-        .card-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1; 
-            border-radius: var(--radius);
-        }
-
-        .project-info {
-            margin-bottom: 20px;
-            pointer-events: none; 
-        }
-
-        .project-id {
-            font-size: 0.65rem;
-            opacity: 0.5;
-            display: block;
-            margin-bottom: 8px;
-            letter-spacing: 1px;
-        }
-
-        .project-name {
-            font-size: 1.4rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-            transition: color 0.3s;
-        }
-
-        .project-desc {
-            font-size: 0.8rem;
-            opacity: 0.7;
-            line-height: 1.4;
-        }
-
-        .action-row {
-            display: flex;
-            gap: 10px;
-            margin-top: auto;
-            align-items: center;
-        }
-
-        .status-pill {
-            font-size: 0.7rem;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-            display: inline-flex;
-            align-items: center;
-            border: 1px solid;
-            transition: all 0.3s ease;
-        }
-
-        .status-pill.green {
-            color: var(--accent-green);
-            background: rgba(46, 204, 113, 0.1);
-            border-color: var(--accent-green);
-        }
-        
-        .card:hover .status-pill.green {
-            background: var(--accent-green);
-            color: #000; 
-            box-shadow: 0 0 15px rgba(46, 204, 113, 0.4);
-        }
-
-        .status-pill.blue {
-            color: var(--accent-blue);
-            background: rgba(0, 225, 255, 0.1);
-            border-color: var(--accent-blue);
-        }
-
-        [data-theme="light"] .status-pill.blue {
-             color: #0088cc; 
-             border-color: #0088cc;
-        }
-
-        .card:hover .status-pill.blue {
-            background: var(--accent-blue);
-            color: #000; 
-            box-shadow: 0 0 15px rgba(0, 225, 255, 0.4);
-        }
-
-        .btn-code {
-            position: relative; 
-            z-index: 2; 
-            text-decoration: none;
-            font-size: 0.75rem;
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--accent-blue);
-            color: var(--accent-blue);
-            background: rgba(0, 225, 255, 0.05);
-            font-weight: bold;
-            transition: all 0.2s;
-            margin-left: auto; 
-        }
-
-        [data-theme="light"] .btn-code {
-             color: #0088cc; 
-             border-color: #0088cc;
-        }
-
-        .btn-code:hover {
-            background: var(--accent-blue);
-            color: #000 !important;
-            border-color: var(--accent-blue) !important;
-            box-shadow: 0 0 15px rgba(0, 225, 255, 0.4);
-        }
-
-        footer {
-            margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.7rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: border-color 0.3s ease;
-        }
-
-        .team-section {
-            display: flex;
-            align-items: center;
-        }
-        .team-label {
-            margin-right: 10px;
-            font-weight: bold;
-        }
-        
-        .team-container {
-            display: inline-flex;
-            align-items: center;
-            min-height: 1rem;
-        }
-
-        .team-container::after {
-            content: '█'; 
-            margin-left: 5px;
-            animation: blink 1s infinite;
-            color: var(--system-accent-color);
-            font-size: 0.8rem;
-            line-height: 1;
-            transition: color 0.5s ease;
-        }
-
-        .team-separator {
-            margin: 0 8px;
-            font-weight: bold;
-        }
-
-        a.social-link {
-            color: inherit;
-            text-decoration: none;
-            margin-left: 15px;
-            position: relative;
-            z-index: 2;
-            transition: color 0.3s ease;
-        }
-        a.social-link:hover {
-            color: var(--system-accent-color);
-        }
-    </style>
-</head>
-<body>
-
-    <div id="custom-cursor"></div>
-
-    <div class="container">
-        <header>
-            <div class="brand">NullYex.</div>
-            <div class="header-right">
-                <button id="theme-toggle" class="theme-btn" onclick="toggleTheme()">[UI MODE: DRK]</button>
-                <div class="meta-info">
-                    SYS.NULLYEX: ONLINE<br>
-                    <span id="date-display">...</span>
-                </div>
-            </div>
-        </header>
-
-        <div class="system-status">
-            <div class="label" style="display: flex; justify-content: space-between; align-items: center;">
-                <span>#: ls (~/NullYex/)</span>
-                <img src="https://komarev.com/ghpvc/?username=NullYex&style=flat&label=NullYex+visits" alt="Profile views counter">
-            </div>
-            <div class="status-bar" id="status-text">
-                > System initialized... <span class="blink">█</span>
-            </div>
-        </div>
-
-        <div class="menu-grid">
-            
-            <div class="card">
-                <a href="/NX-Crypt" class="card-overlay" target="_blank"></a>
-                <div class="project-info">
-                    <span class="project-id">REPO/001</span>
-                    <div class="project-name">NX-Crypt</div>
-                    <div class="project-desc">Smart Secure Encryption Utility</div>
-                </div>
-                <div class="action-row">
-                    <div class="status-pill green">● LIVE</div>
-                    <a href="https://github.com/NullYex/NX-Crypt" target="_blank" class="btn-code">:: CLI VER.</a>
-                </div>
-            </div>
-
-            <div class="card">
-                <a href="/AttendEX" class="card-overlay" target="_blank"></a>
-                <div class="project-info">
-                    <span class="project-id">REPO/002</span>
-                    <div class="project-name">AttendEX</div>
-                    <div class="project-desc">Attendance Management System</div>
-                </div>
-                <div class="action-row">
-                    <div class="status-pill green">● LIVE</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <a href="https://github.com/NullYex/gcc-installer" target="_blank" class="card-overlay"></a>
-                <div class="project-info">
-                    <span class="project-id">SRC/003</span>
-                    <div class="project-name">gcc-installer</div>
-                    <div class="project-desc">Automated Compiler Setup for Windows</div>
-                </div>
-                <div class="action-row">
-                    <div class="status-pill blue">./SCRIPT</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <a href="/EcoQuest" class="card-overlay" target="_blank"></a>
-                <div class="project-info">
-                    <span class="project-id">REPO/004</span>
-                    <div class="project-name">EcoQuest</div>
-                    <div class="project-desc">Sustainability Platform</div>
-                </div>
-                <div class="action-row">
-                    <div class="status-pill green">● LIVE</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <a href="https://github.com/NullYex" target="_blank" class="card-overlay"></a>
-                <div class="project-info">
-                    <span class="project-id">EXT/HUB</span>
-                    <div class="project-name">GitHub Profile</div>
-                    <div class="project-desc">View all repositories</div>
-                </div>
-                <div class="action-row">
-                    <div class="status-pill blue">↗ GITHUB PAGE</div>
-                </div>
-            </div>
-        </div>
-
-        <footer>
-            <div class="team-section">
-                <span class="team-label">SYS.TEAM ::</span>
-                <span id="team-display" class="team-container"></span>
-            </div>
-            <div>
-                <a href="https://github.com/NullYex" class="social-link" target="_blank">GITHUB</a>
-            </div>
-        </footer>
-    </div>
-
-    <script>
-        const toggleBtn = document.getElementById('theme-toggle');
-        
-        function toggleTheme() {
-            const html = document.documentElement;
-            if (html.getAttribute('data-theme') === 'light') {
-                html.removeAttribute('data-theme');
-                toggleBtn.textContent = '[MODE: DRK]';
-            } else {
-                html.setAttribute('data-theme', 'light');
-                toggleBtn.textContent = '[MODE: LGT]';
+            @media (min-width: 768px) {
+                .menu-grid {
+                    grid-template-columns: 1fr 1fr;
+                }
             }
-        }
 
-        const cursor = document.getElementById('custom-cursor');
-        
-        let mouseX = 0, mouseY = 0;
-        let cursorX = 0, cursorY = 0;
-        const speed = 0.5;
+            .card {
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius-pebble);
+                padding: 30px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                position: relative;
+                min-height: 200px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+            }
 
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-        });
+            .card:hover {
+                border-color: rgba(255, 255, 255, 0.2);
+                transform: translateY(-8px);
+                box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            }
 
-        const interactiveElements = document.querySelectorAll('a, .card, button');
-        interactiveElements.forEach(el => {
-            el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
-            el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
-        });
+            [data-theme="light"] .card:hover {
+                border-color: rgba(0, 0, 0, 0.15);
+            }
 
-        function animateCursor() {
-            const distX = mouseX - cursorX;
-            const distY = mouseY - cursorY;
-            
-            cursorX += distX * speed;
-            cursorY += distY * speed;
+            .card-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+                border-radius: var(--radius-pebble);
+            }
 
-            const velocity = Math.sqrt(distX * distX + distY * distY);
-            const scale = Math.min(velocity / 15, 0.5);
-            const angle = Math.atan2(distY, distX) * 180 / Math.PI;
+            .project-info {
+                margin-bottom: 20px;
+                pointer-events: none;
+            }
 
-            cursor.style.transform = `
-                translate3d(${cursorX}px, ${cursorY}px, 0) 
-                translate(-50%, -50%) 
-                rotate(${angle}deg) 
-                scale(${1 + scale}, ${1 - scale * 0.5})
-            `;
+            .project-id {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+                display: block;
+                margin-bottom: 12px;
+                letter-spacing: 1px;
+            }
 
-            requestAnimationFrame(animateCursor);
-        }
-        animateCursor();
+            .project-name {
+                font-size: 1.6rem;
+                font-weight: 700;
+                margin-bottom: 8px;
+                letter-spacing: -0.5px;
+            }
 
-        const dateEl = document.getElementById('date-display');
-        const now = new Date();
-        const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' };
-        dateEl.textContent = now.toLocaleDateString('en-US', options).toUpperCase();
+            .project-desc {
+                font-size: 0.9rem;
+                color: var(--text-muted);
+                line-height: 1.5;
+            }
 
-        const teamMembers = ['Amrit Ranjan', 'Farhan Khalid', 'Kamran Alvi'];
-        const teamContainer = document.getElementById('team-display');
-        
-        let separators = ['|', '●']; 
-        let themes = [
-            { color: 'var(--accent-green)', dim: 'rgba(46, 204, 113, 0.05)' },
-            { color: 'var(--accent-blue)', dim: 'rgba(0, 225, 255, 0.05)' }
-        ];
+            .action-row {
+                display: flex;
+                gap: 12px;
+                margin-top: auto;
+                align-items: center;
+            }
 
-        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+            .status-pill {
+                font-size: 0.7rem;
+                padding: 6px 14px;
+                border-radius: 20px;
+                font-weight: bold;
+                letter-spacing: 0.5px;
+                display: inline-flex;
+                align-items: center;
+                border: 1px solid;
+                transition: all 0.3s ease;
+            }
 
-        async function typeWriterLoop() {
-            while (true) {
-                const currentSymbol = separators[Math.floor(Math.random() * separators.length)];
-                
-                const themeIndex = Math.floor(Math.random() * themes.length);
-                const currentTheme = themes[themeIndex];
+            .status-pill.green {
+                color: var(--accent-green);
+                background: rgba(46, 204, 113, 0.1);
+                border-color: rgba(46, 204, 113, 0.3);
+            }
 
-                const oppositeThemeIndex = 1 - themeIndex;
-                const oppositeTheme = themes[oppositeThemeIndex];
+            .card:hover .status-pill.green {
+                background: var(--accent-green);
+                color: #000;
+                border-color: var(--accent-green);
+                box-shadow: 0 0 20px rgba(46, 204, 113, 0.3);
+            }
 
-                document.documentElement.style.setProperty('--system-accent-color', currentTheme.color);
-                document.documentElement.style.setProperty('--dim-color', currentTheme.dim);
-                document.documentElement.style.setProperty('--cursor-ball-color', oppositeTheme.color);
+            .status-pill.blue {
+                color: var(--accent-blue);
+                background: rgba(0, 225, 255, 0.1);
+                border-color: rgba(0, 225, 255, 0.3);
+            }
 
+            .card:hover .status-pill.blue {
+                background: var(--accent-blue);
+                color: #fff;
+                border-color: var(--accent-blue);
+                box-shadow: 0 0 20px rgba(0, 225, 255, 0.3);
+            }
 
-                for (let i = 0; i < teamMembers.length; i++) {
-                    const name = teamMembers[i];
-                    const nameSpan = document.createElement('span');
-                    teamContainer.appendChild(nameSpan);
+            .btn-code {
+                position: relative;
+                z-index: 2;
+                text-decoration: none;
+                font-size: 0.75rem;
+                padding: 8px 16px;
+                border-radius: 12px;
+                border: 1px solid rgba(0, 225, 255, 0.3);
+                color: var(--accent-blue);
+                background: rgba(0, 225, 255, 0.05);
+                font-weight: bold;
+                transition: all 0.3s;
+                margin-left: auto;
+            }
 
-                    for (let char of name) {
-                        nameSpan.textContent += char;
-                        await sleep(50); 
-                    }
+            .btn-code:hover {
+                background: var(--accent-blue);
+                color: #fff !important;
+                border-color: var(--accent-blue) !important;
+                box-shadow: 0 0 20px rgba(0, 225, 255, 0.3);
+                transform: scale(1.05);
+            }
 
-                    if (i < teamMembers.length - 1) {
-                        const sepSpan = document.createElement('span');
-                        sepSpan.className = 'team-separator';
-                        sepSpan.style.color = currentTheme.color; 
-                        sepSpan.textContent = currentSymbol;
-                        teamContainer.appendChild(sepSpan);
-                        await sleep(50); 
-                    }
+            footer {
+                margin-top: 60px;
+                padding: 30px 0 10px 0;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                align-items: flex-start;
+            }
+
+            @media (min-width: 768px) {
+                footer {
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+            }
+
+            .team-section {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                flex-wrap: wrap;
+                overflow: hidden;
+            }
+
+            .team-label {
+                font-size: 0.75rem;
+                font-weight: 700;
+                color: var(--text-color);
+                opacity: 0.8;
+                margin-right: 5px;
+            }
+
+            .team-members {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                flex-wrap: wrap;
+                --active-color: var(--system-accent-color);
+                --active-dim: var(--dim-color);
+            }
+
+            .team-pill {
+                display: inline-block;
+                font-size: 0.75rem;
+                padding: 6px 14px;
+                border-radius: 20px;
+                font-weight: 700;
+                white-space: nowrap;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                backdrop-filter: blur(10px);
+                color: var(--active-color);
+                border: 1px solid var(--active-color);
+                background: var(--active-dim);
+                box-shadow: 0 0 10px var(--active-dim);
+            }
+
+            .team-pill.fade-out {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            .team-pill.fade-in {
+                animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            }
+
+            @keyframes slideIn {
+                0% {
+                    opacity: 0;
+                    transform: translateX(20px);
                 }
 
-                await sleep(4000); 
+                100% {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
 
-                while (teamContainer.lastChild) {
-                    const lastNode = teamContainer.lastChild;
-                    if (lastNode.className === 'team-separator') {
-                        teamContainer.removeChild(lastNode);
-                        await sleep(30);
-                    } else {
-                        let text = lastNode.textContent;
-                        while (text.length > 0) {
-                            text = text.slice(0, -1);
-                            lastNode.textContent = text;
-                            await sleep(20); 
+            a.social-link {
+                font-size: 0.8rem;
+                color: var(--text-color);
+                text-decoration: none;
+                padding: 8px 16px;
+                background: var(--glass-bg);
+                border: 1px solid var(--glass-border);
+                border-radius: 20px;
+                position: relative;
+                z-index: 2;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+                white-space: nowrap;
+            }
+
+            a.social-link:hover {
+                color: var(--bg-color);
+                background: var(--text-color);
+                transform: translateY(-2px);
+            }
+
+            @media (max-width: 600px) {
+                header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 16px;
+                    margin-bottom: 30px;
+                }
+
+                .brand {
+                    font-size: 2.5rem;
+                    white-space: nowrap;
+                }
+
+                .header-right {
+                    align-items: flex-start;
+                    text-align: left;
+                    flex-direction: column-reverse;
+                    gap: 16px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="target-cursor-wrapper">
+            <div class="target-cursor-dot"></div>
+            <div class="target-cursor-corner corner-tl"></div>
+            <div class="target-cursor-corner corner-tr"></div>
+            <div class="target-cursor-corner corner-br"></div>
+            <div class="target-cursor-corner corner-bl"></div>
+        </div>
+        <div class="container">
+            <header>
+                <div class="brand">NullYex.</div>
+                <div class="header-right">
+                    <button id="theme-toggle" class="theme-btn" onclick="toggleTheme()">[UI MODE: DRK]</button>
+                    <div class="meta-info">
+                        SYS.NULLYEX: ONLINE<br>
+                        <span id="date-display">...</span>
+                    </div>
+                </div>
+            </header>
+            <div class="system-status">
+                <div class="label-row">
+                    <span>~/NullYex/.</span>
+                    <img src="https://komarev.com/ghpvc/?username=NullYex&style=flat&label=Visits&color=2ecc71" alt="Profile views counter">
+                </div>
+                <div class="status-bar" id="status-text">
+                    > Initializing secure connection... <span class="blink">█</span>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="card">
+                    <a href="/NX-Crypt" class="card-overlay" target="_blank"></a>
+                    <div class="project-info">
+                        <span class="project-id">REPO/001</span>
+                        <div class="project-name">NX-Crypt</div>
+                        <div class="project-desc">Smart Secure File & Text Encryption Utility Tool.</div>
+                    </div>
+                    <div class="action-row">
+                        <div class="status-pill green">● LIVE</div>
+                        <a href="https://github.com/NullYex/NX-Crypt" target="_blank" class="btn-code">:: CLI VER.</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <a href="/AttendEX" class="card-overlay" target="_blank"></a>
+                    <div class="project-info">
+                        <span class="project-id">REPO/002</span>
+                        <div class="project-name">AttendEX</div>
+                        <div class="project-desc">Smart & Modern Attendance marking System with quick export and sharing.</div>
+                    </div>
+                    <div class="action-row">
+                        <div class="status-pill green">● LIVE</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <a href="https://github.com/NullYex/gcc-installer" target="_blank" class="card-overlay"></a>
+                    <div class="project-info">
+                        <span class="project-id">SRC/003</span>
+                        <div class="project-name">gcc-installer</div>
+                        <div class="project-desc">Automated C/C++ Compiler Setup one-line script for Windows.</div>
+                    </div>
+                    <div class="action-row">
+                        <div class="status-pill blue">./SCRIPT</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <a href="/EcoQuest" class="card-overlay" target="_blank"></a>
+                    <div class="project-info">
+                        <span class="project-id">REPO/004</span>
+                        <div class="project-name">EcoQuest</div>
+                        <div class="project-desc">An interactive sustainability platform promoting eco-friendly habits.</div>
+                    </div>
+                    <div class="action-row">
+                        <div class="status-pill green">● LIVE</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <a href="https://github.com/NullYex" target="_blank" class="card-overlay"></a>
+                    <div class="project-info">
+                        <span class="project-id">EXT/HUB</span>
+                        <div class="project-name">GitHub Profile</div>
+                        <div class="project-desc">Explore our open-source codebase and core organization repositories.</div>
+                    </div>
+                    <div class="action-row">
+                        <div class="status-pill blue">↗ GITHUB PAGE</div>
+                    </div>
+                </div>
+            </div>
+            <footer>
+                <div class="team-section">
+                    <span class="team-label">CORE.TEAM ::</span>
+                    <div class="team-members" id="team-roster">
+                        <span class="team-pill">Amrit Ranjan</span>
+                        <span class="team-pill">Farhan Khalid</span>
+                        <span class="team-pill">Kamran Alvi</span>
+                    </div>
+                </div>
+                <div>
+                    <a href="https://github.com/NullYex" class="social-link" target="_blank">GitHub</a>
+                </div>
+            </footer>
+        </div>
+        <script>
+            const toggleBtn = document.getElementById('theme-toggle');
+
+            function toggleTheme() {
+                const html = document.documentElement;
+                if (html.getAttribute('data-theme') === 'light') {
+                    html.removeAttribute('data-theme');
+                    toggleBtn.textContent = '[UI MODE: DRK]';
+                } else {
+                    html.setAttribute('data-theme', 'light');
+                    toggleBtn.textContent = '[UI MODE: LGT]';
+                }
+            }
+
+            const dateEl = document.getElementById('date-display');
+            const now = new Date();
+            const options = {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            dateEl.textContent = now.toLocaleDateString('en-US', options).toUpperCase();
+
+            const roster = document.getElementById('team-roster');
+            const highlightColors = [{
+                hex: '#2ecc71',
+                dim: 'rgba(46, 204, 113, 0.15)'
+            }, {
+                hex: '#00e1ff',
+                dim: 'rgba(0, 225, 255, 0.15)'
+            }, {
+                hex: '#ff2a6d',
+                dim: 'rgba(255, 42, 109, 0.15)'
+            }, {
+                hex: '#b620e0',
+                dim: 'rgba(182, 32, 224, 0.15)'
+            }, {
+                hex: '#ffcc00',
+                dim: 'rgba(255, 204, 0, 0.15)'
+            }];
+
+            let lastColorIndex = 0;
+
+            function rotateTeam() {
+                const firstMember = roster.firstElementChild;
+                firstMember.classList.add('fade-out');
+
+                setTimeout( () => {
+                    firstMember.classList.remove('fade-out');
+                    roster.appendChild(firstMember);
+                    let nextColorIndex;
+                    do {
+                        nextColorIndex = Math.floor(Math.random() * highlightColors.length);
+                    } while (nextColorIndex === lastColorIndex);
+
+                    lastColorIndex = nextColorIndex;
+                    const newColor = highlightColors[nextColorIndex];
+                    roster.style.setProperty('--active-color', newColor.hex);
+                    roster.style.setProperty('--active-dim', newColor.dim);
+                    const newFirst = roster.firstElementChild;
+                    newFirst.classList.add('fade-in');
+
+                    setTimeout( () => {
+                        newFirst.classList.remove('fade-in');
+                    }
+                    , 400);
+                }
+                , 400);
+            }
+            setInterval(rotateTeam, 3500);
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const cursorWrapper = document.querySelector('.target-cursor-wrapper');
+                const dotRef = document.querySelector('.target-cursor-dot');
+                const cornersRef = document.querySelectorAll('.target-cursor-corner');
+
+                const isMobile = ('ontouchstart'in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
+
+                if (!isMobile && cursorWrapper) {
+                    let spinDuration = 2;
+                    let hoverDuration = 0.2;
+                    let parallaxOn = true;
+                    let activeTarget = null;
+                    let activeStrength = 0;
+                    let targetCornerPositions = null;
+                    let activeCornerData = null;
+                    let spinTl;
+                    const constants = {
+                        cornerSize: 12
+                    };
+                    const targetSelector = 'a, .card, button';
+
+                    const posSize = constants.cornerSize;
+                    gsap.set('.corner-tl', {
+                        x: -posSize * 1.5,
+                        y: -posSize * 1.5
+                    });
+                    gsap.set('.corner-tr', {
+                        x: posSize * 0.5,
+                        y: -posSize * 1.5
+                    });
+                    gsap.set('.corner-br', {
+                        x: posSize * 0.5,
+                        y: posSize * 0.5
+                    });
+                    gsap.set('.corner-bl', {
+                        x: -posSize * 1.5,
+                        y: posSize * 0.5
+                    });
+
+                    gsap.set(cursorWrapper, {
+                        xPercent: -50,
+                        yPercent: -50,
+                        x: window.innerWidth / 2,
+                        y: window.innerHeight / 2
+                    });
+
+                    function createSpinTimeline() {
+                        if (spinTl)
+                            spinTl.kill();
+                        spinTl = gsap.timeline({
+                            repeat: -1
+                        }).to(cursorWrapper, {
+                            rotation: '+=360',
+                            duration: spinDuration,
+                            ease: 'none'
+                        });
+                    }
+                    createSpinTimeline();
+
+                    window.addEventListener('mousemove', (e) => {
+                        gsap.to(cursorWrapper, {
+                            x: e.clientX,
+                            y: e.clientY,
+                            duration: 0.1,
+                            ease: 'power3.out'
+                        });
+                    }
+                    );
+
+                    const tickerFn = () => {
+                        if (activeTarget && activeCornerData && activeStrength > 0) {
+                            const rect = activeTarget.getBoundingClientRect();
+                            const {padding, sizes} = activeCornerData;
+
+                            const bLeft = rect.left - padding;
+                            const bTop = rect.top - padding;
+                            const bRight = rect.right + padding;
+                            const bBottom = rect.bottom + padding;
+
+                            targetCornerPositions = [{
+                                x: bLeft,
+                                y: bTop
+                            }, {
+                                x: bRight - sizes[1],
+                                y: bTop
+                            }, {
+                                x: bRight - sizes[2],
+                                y: bBottom - sizes[2]
+                            }, {
+                                x: bLeft,
+                                y: bBottom - sizes[3]
+                            }];
                         }
-                        teamContainer.removeChild(lastNode);
+
+                        if (!targetCornerPositions || activeStrength === 0)
+                            return;
+
+                        const cursorX = gsap.getProperty(cursorWrapper, 'x');
+                        const cursorY = gsap.getProperty(cursorWrapper, 'y');
+
+                        cornersRef.forEach( (corner, i) => {
+                            const currentX = gsap.getProperty(corner, 'x');
+                            const currentY = gsap.getProperty(corner, 'y');
+
+                            const targetX = targetCornerPositions[i].x - cursorX;
+                            const targetY = targetCornerPositions[i].y - cursorY;
+
+                            const finalX = currentX + (targetX - currentX) * activeStrength;
+                            const finalY = currentY + (targetY - currentY) * activeStrength;
+
+                            const duration = activeStrength >= 0.99 ? (parallaxOn ? 0.2 : 0) : 0.05;
+
+                            gsap.to(corner, {
+                                x: finalX,
+                                y: finalY,
+                                duration: duration,
+                                ease: duration === 0 ? 'none' : 'power1.out',
+                                overwrite: 'auto'
+                            });
+                        }
+                        );
                     }
+                    ;
+                    gsap.ticker.add(tickerFn);
+
+                    let currentLeaveHandler = null;
+                    let resumeTimeout = null;
+
+                    window.addEventListener('mouseover', (e) => {
+                        const target = e.target.closest(targetSelector);
+                        if (!target || activeTarget === target)
+                            return;
+
+                        if (activeTarget && currentLeaveHandler) {
+                            activeTarget.removeEventListener('mouseleave', currentLeaveHandler);
+                        }
+                        if (resumeTimeout) {
+                            clearTimeout(resumeTimeout);
+                            resumeTimeout = null;
+                        }
+
+                        activeTarget = target;
+                        cornersRef.forEach(corner => gsap.killTweensOf(corner));
+                        gsap.killTweensOf(cursorWrapper, 'rotation');
+                        if (spinTl)
+                            spinTl.pause();
+                        gsap.set(cursorWrapper, {
+                            rotation: 0
+                        });
+
+                        const rect = target.getBoundingClientRect();
+                        const {cornerSize} = constants;
+                        const cursorX = gsap.getProperty(cursorWrapper, 'x');
+                        const cursorY = gsap.getProperty(cursorWrapper, 'y');
+
+                        const padding = Math.max(6, Math.min(12, Math.min(rect.width, rect.height) * 0.1));
+
+                        const boxWidth = rect.width + padding * 2;
+                        const boxHeight = rect.height + padding * 2;
+                        const maxRad = Math.min(boxWidth, boxHeight) / 2;
+
+                        const compStyle = window.getComputedStyle(target);
+                        const getRad = (val) => {
+                            let r = parseFloat(val) || 0;
+                            const maxElemRad = Math.min(rect.width, rect.height) / 2;
+                            if (r > maxElemRad)
+                                r = maxElemRad;
+                            return r > 0 ? Math.min(r + padding, maxRad) : 0;
+                        }
+                        ;
+
+                        const rTL = getRad(compStyle.borderTopLeftRadius);
+                        const rTR = getRad(compStyle.borderTopRightRadius);
+                        const rBR = getRad(compStyle.borderBottomRightRadius);
+                        const rBL = getRad(compStyle.borderBottomLeftRadius);
+
+                        const getCornerSize = (r) => Math.min(maxRad, Math.max(cornerSize, r));
+
+                        const sizes = [getCornerSize(rTL), getCornerSize(rTR), getCornerSize(rBR), getCornerSize(rBL)];
+
+                        const radii = [rTL, rTR, rBR, rBL];
+
+                        activeCornerData = {
+                            padding,
+                            sizes,
+                            radii
+                        };
+
+                        const bLeft = rect.left - padding;
+                        const bTop = rect.top - padding;
+                        const bRight = rect.right + padding;
+                        const bBottom = rect.bottom + padding;
+
+                        targetCornerPositions = [{
+                            x: bLeft,
+                            y: bTop
+                        }, {
+                            x: bRight - sizes[1],
+                            y: bTop
+                        }, {
+                            x: bRight - sizes[2],
+                            y: bBottom - sizes[2]
+                        }, {
+                            x: bLeft,
+                            y: bBottom - sizes[3]
+                        }];
+
+                        const strengthObj = {
+                            current: 0
+                        };
+                        gsap.to(strengthObj, {
+                            current: 1,
+                            duration: hoverDuration,
+                            ease: 'power2.out',
+                            onUpdate: () => {
+                                activeStrength = strengthObj.current;
+                            }
+                        });
+
+                        cornersRef.forEach( (corner, i) => {
+                            let radiusProp = {};
+                            if (i === 0)
+                                radiusProp = {
+                                    borderTopLeftRadius: radii[0]
+                                };
+                            if (i === 1)
+                                radiusProp = {
+                                    borderTopRightRadius: radii[1]
+                                };
+                            if (i === 2)
+                                radiusProp = {
+                                    borderBottomRightRadius: radii[2]
+                                };
+                            if (i === 3)
+                                radiusProp = {
+                                    borderBottomLeftRadius: radii[3]
+                                };
+
+                            gsap.to(corner, {
+                                x: targetCornerPositions[i].x - cursorX,
+                                y: targetCornerPositions[i].y - cursorY,
+                                width: sizes[i],
+                                height: sizes[i],
+                                ...radiusProp,
+                                duration: 0.2,
+                                ease: 'power2.out'
+                            });
+                        }
+                        );
+
+                        currentLeaveHandler = () => {
+                            activeTarget = null;
+                            targetCornerPositions = null;
+                            activeCornerData = null;
+                            activeStrength = 0;
+
+                            const posSize = constants.cornerSize;
+                            const positions = [{
+                                x: -posSize * 1.5,
+                                y: -posSize * 1.5
+                            }, {
+                                x: posSize * 0.5,
+                                y: -posSize * 1.5
+                            }, {
+                                x: posSize * 0.5,
+                                y: posSize * 0.5
+                            }, {
+                                x: -posSize * 1.5,
+                                y: posSize * 0.5
+                            }];
+
+                            cornersRef.forEach( (corner, index) => {
+                                gsap.killTweensOf(corner);
+                                gsap.to(corner, {
+                                    x: positions[index].x,
+                                    y: positions[index].y,
+                                    width: posSize,
+                                    height: posSize,
+                                    borderTopLeftRadius: 0,
+                                    borderTopRightRadius: 0,
+                                    borderBottomRightRadius: 0,
+                                    borderBottomLeftRadius: 0,
+                                    duration: 0.3,
+                                    ease: 'power3.out'
+                                });
+                            }
+                            );
+
+                            resumeTimeout = setTimeout( () => {
+                                if (!activeTarget) {
+                                    const currentRotation = gsap.getProperty(cursorWrapper, 'rotation') || 0;
+                                    const normalizedRotation = currentRotation % 360;
+                                    if (spinTl)
+                                        spinTl.kill();
+                                    spinTl = gsap.timeline({
+                                        repeat: -1
+                                    }).to(cursorWrapper, {
+                                        rotation: '+=360',
+                                        duration: spinDuration,
+                                        ease: 'none'
+                                    });
+                                    gsap.to(cursorWrapper, {
+                                        rotation: normalizedRotation + 360,
+                                        duration: spinDuration * (1 - normalizedRotation / 360),
+                                        ease: 'none',
+                                        onComplete: () => {
+                                            if (spinTl)
+                                                spinTl.restart();
+                                        }
+                                    });
+                                }
+                                resumeTimeout = null;
+                            }
+                            , 50);
+                            target.removeEventListener('mouseleave', currentLeaveHandler);
+                        }
+                        ;
+                        target.addEventListener('mouseleave', currentLeaveHandler);
+                    }
+                    );
+
+                    window.addEventListener('mousedown', () => {
+                        gsap.to(dotRef, {
+                            scale: 0.7,
+                            duration: 0.3
+                        });
+                        gsap.to(cursorWrapper, {
+                            scale: 0.9,
+                            duration: 0.2
+                        });
+                    }
+                    );
+
+                    window.addEventListener('mouseup', () => {
+                        gsap.to(dotRef, {
+                            scale: 1,
+                            duration: 0.3
+                        });
+                        gsap.to(cursorWrapper, {
+                            scale: 1,
+                            duration: 0.2
+                        });
+                    }
+                    );
+
+                    window.addEventListener('scroll', () => {
+                        if (!activeTarget)
+                            return;
+                        const mouseX = gsap.getProperty(cursorWrapper, 'x');
+                        const mouseY = gsap.getProperty(cursorWrapper, 'y');
+                        const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
+                        const isStillOverTarget = elementUnderMouse && (elementUnderMouse === activeTarget || elementUnderMouse.closest(targetSelector) === activeTarget);
+                        if (!isStillOverTarget && currentLeaveHandler) {
+                            currentLeaveHandler();
+                        }
+                    }
+                    , {
+                        passive: true
+                    });
+                } else if (isMobile && cursorWrapper) {
+                    cursorWrapper.style.display = 'none';
                 }
-
-                const first = teamMembers.shift();
-                teamMembers.push(first);
-                
-                await sleep(500); 
             }
-        }
-
-        typeWriterLoop();
-    </script>
-</body>
+            );
+        </script>
+    </body>
 </html>
