@@ -762,48 +762,46 @@
 
             function initTeamWheel() {
                 const wheel = document.getElementById('team-wheel');
-                if (!wheel)
-                    return;
-
+                if (!wheel) return;
+            
                 const originalItems = wheel.querySelectorAll('.wheel-item');
                 const itemHeight = 70;
                 const totalOriginal = originalItems.length;
-
+            
                 originalItems.forEach(item => {
                     wheel.appendChild(item.cloneNode(true));
-                }
-                );
-
+                });
+            
                 const allItems = wheel.querySelectorAll('.wheel-item');
                 let currentIndex = 0;
-
+            
                 allItems.forEach(i => i.classList.remove('active'));
                 allItems[0].classList.add('active');
-                setInterval( () => {
-                    currentIndex++;
 
+                function nextSlide() {
+                    currentIndex++;
+            
                     allItems.forEach(i => i.classList.remove('active'));
                     if (allItems[currentIndex]) {
                         allItems[currentIndex].classList.add('active');
                     }
-
+            
                     gsap.to(wheel, {
                         y: -(currentIndex * itemHeight),
                         duration: 0.8,
                         ease: "power3.inOut",
                         onComplete: () => {
                             if (currentIndex === totalOriginal) {
-                                gsap.set(wheel, {
-                                    y: 0
-                                });
+                                gsap.set(wheel, { y: 0 });
                                 currentIndex = 0;
                                 allItems.forEach(i => i.classList.remove('active'));
                                 allItems[0].classList.add('active');
                             }
+                            gsap.delayedCall(3.2, nextSlide);
                         }
                     });
                 }
-                , 4000);
+                gsap.delayedCall(4, nextSlide);
             }
 
             document.addEventListener('DOMContentLoaded', () => {
